@@ -23,6 +23,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
@@ -33,9 +35,8 @@ import java.util.concurrent.Future;
  * @see FitnessEvaluator
  */
 public abstract class AbstractEvolutionEngine<T> implements EvolutionEngine<T>
-{
-    // A single multi-threaded worker is shared among multiple evolution engine instances.
-    private static FitnessEvaluationWorker concurrentWorker = null;
+{    
+    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private final Set<EvolutionObserver<? super T>> observers = new CopyOnWriteArraySet<EvolutionObserver<? super T>>();
 
@@ -214,7 +215,7 @@ public abstract class AbstractEvolutionEngine<T> implements EvolutionEngine<T>
                 // Submit tasks for execution and wait until all threads have finished fitness evaluations.
                 for (T candidate : population)
                 {
-                    results.add(getSharedWorker().submit(new FitnessEvalutationTask<T>(fitnessEvaluator,
+                    results.add(executorService.submit(new FitnessEvalutationTask<T>(fitnessEvaluator,
                                                                                        candidate,
                                                                                        unmodifiablePopulation)));
                 }
@@ -325,17 +326,8 @@ public abstract class AbstractEvolutionEngine<T> implements EvolutionEngine<T>
     {
         this.singleThreaded = singleThreaded;
     }
-
-
-    /**
-     * Lazily create the multi-threaded worker for fitness evaluations.
-     */
-    private static synchronized FitnessEvaluationWorker getSharedWorker()
-    {
-        if (concurrentWorker == null)
-        {
-            concurrentWorker = new FitnessEvaluationWorker();
-        }
-        return concurrentWorker;
+        
+    public void setExecutorService(ExecutorService es){
+        this.executorService = es;
     }
 }
