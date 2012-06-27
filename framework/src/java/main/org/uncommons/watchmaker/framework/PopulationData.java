@@ -15,6 +15,8 @@
 //=============================================================================
 package org.uncommons.watchmaker.framework;
 
+import java.util.List;
+
 /**
  * Immutable data object containing statistics about the state of
  * an evolved population and a reference to the fittest candidate
@@ -26,8 +28,7 @@ package org.uncommons.watchmaker.framework;
  */
 public final class PopulationData<T>
 {
-    private final T bestCandidate;
-    private final double bestCandidateFitness;
+    private final List<EvaluatedCandidate<T>> evaluatedPopulation;
     private final double meanFitness;
     private final double fitnessStandardDeviation;
     private final boolean naturalFitness;
@@ -52,8 +53,7 @@ public final class PopulationData<T>
      * that was processed.
      * @param elapsedTime The number of milliseconds since the start of the
      */
-    public PopulationData(T bestCandidate,
-                          double bestCandidateFitness,
+    public PopulationData(List<EvaluatedCandidate<T>> evaluatedPopulation,
                           double meanFitness,
                           double fitnessStandardDeviation,
                           boolean naturalFitness,
@@ -62,8 +62,7 @@ public final class PopulationData<T>
                           int generationNumber,
                           long elapsedTime)
     {
-        this.bestCandidate = bestCandidate;
-        this.bestCandidateFitness = bestCandidateFitness;
+        this.evaluatedPopulation = evaluatedPopulation;
         this.meanFitness = meanFitness;
         this.fitnessStandardDeviation = fitnessStandardDeviation;
         this.naturalFitness = naturalFitness;
@@ -72,6 +71,10 @@ public final class PopulationData<T>
         this.generationNumber = generationNumber;
         this.elapsedTime = elapsedTime;
     }
+		
+		public List<EvaluatedCandidate<T>> getEvaluatedPopulation(){
+			return evaluatedPopulation;
+		}
 
 
     /**
@@ -80,7 +83,7 @@ public final class PopulationData<T>
      */
     public T getBestCandidate()
     {
-        return bestCandidate;
+        return evaluatedPopulation.get(0).getCandidate();
     }
 
 
@@ -90,7 +93,7 @@ public final class PopulationData<T>
      */
     public double getBestCandidateFitness()
     {
-        return bestCandidateFitness;
+        return evaluatedPopulation.get(0).getFitness();
     }
 
 
