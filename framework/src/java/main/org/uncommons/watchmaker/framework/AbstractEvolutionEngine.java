@@ -330,4 +330,8 @@ public abstract class AbstractEvolutionEngine<T> implements EvolutionEngine<T>
     public void setExecutorService(ExecutorService es){
         this.executorService = es;
     }
+		
+		public void shutdown(){
+			this.executorService.shutdown();
+		}
 }
